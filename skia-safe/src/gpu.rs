@@ -19,7 +19,7 @@ pub use ganesh::{
     BackendAPI, BackendFormat, BackendRenderTarget, BackendSemaphore, BackendTexture,
     DirectContext, DirectContextId, DriverBugWorkarounds, FlushInfo, PurgeResourceOptions,
     RecordingContext, SemaphoresSubmitted, SubmitInfo, SurfaceOrigin, SyncCpu,
-    YUVABackendTextureInfo, YUVABackendTextures, context_options::ContextOptions, images,
+    YUVABackendTextureInfo, YUVABackendTextures, context_options::ContextOptions, images, meshes,
 };
 
 #[cfg(any(feature = "ganesh", feature = "graphite"))]

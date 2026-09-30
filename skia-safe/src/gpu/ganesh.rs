@@ -8,6 +8,7 @@ mod driver_bug_workarounds;
 #[cfg(feature = "gl")]
 pub mod gl;
 mod image_ganesh;
+mod mesh_ganesh;
 #[cfg(feature = "metal")]
 pub mod mtl;
 mod recording_context;
@@ -23,6 +24,9 @@ pub use direct_context::*;
 pub use driver_bug_workarounds::*;
 pub mod images {
     pub use super::image_ganesh::*;
+}
+pub mod meshes {
+    pub use super::mesh_ganesh::*;
 }
 pub use recording_context::*;
 pub use types::*;
