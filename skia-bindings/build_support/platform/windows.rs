@@ -74,6 +74,32 @@ impl PlatformDetails for Msvc {
     fn link_libraries(&self, features: &Features) -> Vec<String> {
         generic_link_libraries(features)
     }
+
+    fn bindgen_args(&self, _target: &Target, _builder: &mut BindgenArgsBuilder) {
+        // Outside a developer prompt, clang does not find the toolset of Visual Studio releases
+        // it does not know (18): `<cassert>` is then missing. Name the toolset the way
+        // `vcvars.bat` does.
+        if cargo::env_var("VCToolsInstallDir").is_none() {
+            if let Some(toolset) = resolve_vc().and_then(|vc| newest_toolset(&vc)) {
+                // The build script is single threaded at this point.
+                unsafe { std::env::set_var("VCToolsInstallDir", toolset) };
+            }
+        }
+    }
+}
+
+/// The newest toolset below `VC\Tools\MSVC`.
+fn newest_toolset(vc: &std::path::Path) -> Option<PathBuf> {
+    let version = |path: &PathBuf| -> Vec<u32> {
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or_default();
+        name.split('.').filter_map(|part| part.parse().ok()).collect()
+    };
+    std::fs::read_dir(vc.join("Tools").join("MSVC"))
+        .ok()?
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.is_dir())
+        .max_by_key(version)
 }
 
 pub struct Generic;
@@ -136,7 +162,11 @@ fn resolve_vc() -> Option<PathBuf> {
         return Some(PathBuf::from(install_dir.trim_end_matches('\\')));
     }
 
-    let releases = [("Program Files", "2022"), ("Program Files (x86)", "2019")];
+    let releases = [
+        ("Program Files", "18"),
+        ("Program Files", "2022"),
+        ("Program Files (x86)", "2019"),
+    ];
     let editions = ["BuildTools", "Enterprise", "Professional", "Community"];
 
     releases
