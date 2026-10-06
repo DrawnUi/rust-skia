@@ -20,7 +20,9 @@ pub fn skia_binaries_url() -> Option<String> {
 
 /// The default URL template to download the binaries from.
 pub fn skia_binaries_url_default() -> String {
-    "https://github.com/rust-skia/skia-binaries/releases/download/{tag}/skia-binaries-{key}.tar.gz"
+    // drawnui-skia-bindings: the prebuilt Skia of these crates is on DrawnUi/rust-skia's releases
+    // (tag = the crate version), so an app needs no SKIA_BINARIES_URL.
+    "https://github.com/DrawnUi/rust-skia/releases/download/{tag}/skia-binaries-{key}.tar.gz"
         .into()
 }
 
