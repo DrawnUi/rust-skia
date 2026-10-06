@@ -1,9 +1,9 @@
 [package]
 
-name = "skia-bindings"
-description = "Skia Bindings for Rust"
-homepage = "https://github.com/rust-skia/rust-skia/tree/master/skia-bindings"
-repository = "https://github.com/rust-skia/rust-skia"
+name = "drawnui-skia-bindings"
+description = "Skia Bindings for Rust (rust-skia skia-bindings 0.153.3) with SkMesh, for DrawnUI for Rust until upstream has it"
+homepage = "https://github.com/DrawnUi/rust-skia"
+repository = "https://github.com/DrawnUi/rust-skia"
 readme = "README.md"
 keywords = ["skia", "rust-bindings", "vulkan", "opengl", "pdf"]
 categories = ["external-ffi-bindings", "graphics", "multimedia::images", "rendering::graphics-api", "visualization"]
@@ -26,6 +26,8 @@ include = [
 	"src/*.rs" ]
 
 [lib]
+# The code of skia-safe and its users names it skia_bindings.
+name = "skia_bindings"
 doctest = false
 
 # Metadata used from inside the packaged crate that defines where to download the Skia archive from.

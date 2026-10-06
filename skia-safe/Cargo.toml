@@ -1,10 +1,10 @@
 [package]
-name = "skia-safe"
+name = "drawnui-skia-safe"
 
-description = "Safe Skia Bindings for Rust"
-homepage = "https://github.com/rust-skia/rust-skia"
-repository = "https://github.com/rust-skia/rust-skia"
-documentation = "https://docs.rs/skia-safe"
+description = "Safe Skia Bindings for Rust (rust-skia skia-safe 0.153.3) with SkMesh, for DrawnUI for Rust until upstream has it"
+homepage = "https://github.com/DrawnUi/rust-skia"
+repository = "https://github.com/DrawnUi/rust-skia"
+documentation = "https://docs.rs/drawnui-skia-safe"
 readme = "README.md"
 # 5 max
 keywords = ["skia", "rust-bindings", "vulkan", "opengl", "pdf"]
@@ -24,6 +24,8 @@ edition.workspace = true
 rust-version.workspace = true
 
 [lib]
+# Used as skia_safe, the same as upstream.
+name = "skia_safe"
 doctest = false
 
 [features]
@@ -63,7 +65,7 @@ graphite = ["skia-bindings/graphite"]
 
 [dependencies]
 bitflags = "2.0"
-skia-bindings = { version = "=0.153.3", path = "../skia-bindings", default-features = false }
+skia-bindings = { package = "drawnui-skia-bindings", version = "=0.153.3", path = "../skia-bindings", default-features = false }
 
 
 # D3D types & ComPtr
