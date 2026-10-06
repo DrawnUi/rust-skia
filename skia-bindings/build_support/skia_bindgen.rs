@@ -1,5 +1,8 @@
 //! Full build support for the SkiaBindings library, and bindings.rs file.
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use bindgen::{CodegenConfig, EnumVariation};
 use cc::Build;
@@ -305,11 +308,41 @@ pub fn generate_bindings(
 
         builder = builder.clang_args(bindgen_args);
 
-        let bindings = builder.generate().expect("Unable to generate bindings");
-        bindings
-            .write_to_file(output_directory.join("bindings.rs"))
+        let bindings = builder
+            .generate()
+            .expect("Unable to generate bindings")
+            .to_string();
+        let bindings = if matches!(target.architecture.as_str(), "i686" | "i586" | "i386") {
+            align_u64_opaque_arrays(&bindings)
+        } else {
+            bindings
+        };
+        fs::write(output_directory.join("bindings.rs"), bindings)
             .expect("Couldn't write bindings!");
     }
+}
+
+/// On 32-bit x86, `u64` is 4-aligned in Rust but bindgen represents a C++ type it cannot see into
+/// (e.g. `alignas(8)` storage like `SkAnySubclass`) as `__BindgenOpaqueArray<u64, N>`, assuming
+/// `u64` brings the 8-byte alignment. The types holding it (`GrBackendFormat`, `GrBackendTexture`,
+/// ...) then come out 4 bytes smaller than in C++ and the layout tests fail. An 8-aligned array
+/// restores the C++ layout.
+fn align_u64_opaque_arrays(bindings: &str) -> String {
+    const ALIGNED: &str = "
+#[derive(PartialEq, Copy, Clone, Debug, Hash)]
+#[repr(C, align(8))]
+pub struct __BindgenOpaqueArrayU64<const N: usize>(pub [u64; N]);
+impl<const N: usize> Default for __BindgenOpaqueArrayU64<N> {
+    fn default() -> Self {
+        Self([0; N])
+    }
+}
+";
+    let replaced = bindings.replace("__BindgenOpaqueArray<u64, ", "__BindgenOpaqueArrayU64<");
+    if replaced == bindings {
+        return replaced;
+    }
+    replaced + ALIGNED
 }
 
 const ALLOWLISTED_FUNCTIONS: &[&str] = &[
