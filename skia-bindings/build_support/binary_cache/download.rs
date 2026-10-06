@@ -33,7 +33,8 @@ pub fn resolve_dependencies() {
     // If `git submodule update` failed, either git is not installed,
     // or we're not building from a git repo.
     // This can happen if the repo is downloaded as a ZIP archive.
-    if !submodules_updated {
+    // A branch without the `skia` submodule (a small git dependency) downloads it too.
+    if !submodules_updated || !dir_not_empty(Path::new("skia")) {
         println!("`git submodule update` failed. Falling back to HTTP download");
         download_dependencies();
     }

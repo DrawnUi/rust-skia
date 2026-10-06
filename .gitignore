@@ -6,3 +6,6 @@ target/
 /tmp/
 .DS_Store
 
+
+# The Skia sources, for source builds only (not a submodule on this branch).
+skia-bindings/skia/
