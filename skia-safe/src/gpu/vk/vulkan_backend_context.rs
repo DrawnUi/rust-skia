@@ -193,6 +193,24 @@ impl BackendContext<'_> {
         self
     }
 
+    /// Tells Skia which device features were enabled when the device was made: a
+    /// `VkPhysicalDeviceFeatures2` and the structs chained to it through `pNext` (for example
+    /// `VkPhysicalDeviceSamplerYcbcrConversionFeatures`, which Skia needs to sample YCbCr images).
+    /// Without it Skia assumes that no feature is enabled. Pass null to unset it.
+    ///
+    /// # Safety
+    /// `features` is null or points to a valid `VkPhysicalDeviceFeatures2` chain that outlives
+    /// every use of this `BackendContext` (creating a `DirectContext` from it).
+    pub unsafe fn set_device_features2(&mut self, features: *const ffi::c_void) -> &mut Self {
+        unsafe {
+            sb::C_VulkanBackendContext_setDeviceFeatures2(
+                self.native.as_ptr() as _,
+                features as *const sb::VkPhysicalDeviceFeatures2,
+            )
+        }
+        self
+    }
+
     pub(crate) unsafe fn begin_resolving(&self) -> impl Drop {
         unsafe { Self::begin_resolving_proc(self.get_proc) }
     }
